@@ -8,7 +8,6 @@ function calculateHoursFromTimeStrings(von, bis) {
 }
 
 function calculateHourDifference(von, bis, useHours) {
-    debugger
     let minutesWorked;
 
     if (bis <= von) {
@@ -41,7 +40,6 @@ function getMinutesAndHoursOfMinutes(minutes) {
 function getMinutesOfTimeString(timeString) {
     const timeObj = getHoursAndMinutesFromTimeString(timeString)
     return timeObj.hours * 60 + timeObj.minutes;
-
 }
 
 function getHoursAndMinutesFromTimeString(timeStr) {
@@ -103,7 +101,6 @@ function calculateNightAndDayWork(fromTime, toTime, nightWorkStart, nightWorkEnd
         }
     }
 
-    console.log(regularMins)
     const dayHH = getMinutesAndHoursOfMinutes(regularMins);
     const nightHH = getMinutesAndHoursOfMinutes(nightMins)
     return {
@@ -140,11 +137,14 @@ function calculateWorkingTimes() {
                 nightHours: {hours: 0, minutes: 0},
             }
         }
+        this.workingTimeObj = returnObj;
 
-        $('#dayHoursValue')[0].innerHTML = returnObj.dayHours.hours;
-        $('#dayMinutesValue')[0].innerHTML = returnObj.dayHours.minutes;
-        $('#nightHoursValue')[0].innerHTML = returnObj.nightHours.hours;
-        $('#nightMinutesValue')[0].innerHTML = returnObj.nightHours.minutes;
+        calculateInDecimalHours()
+
+        $('#dayHoursValue')[0].innerHTML = returnObj.dayHours.hours < 10 ? "0" + returnObj.dayHours.hours : returnObj.dayHours.hours;
+        $('#dayMinutesValue')[0].innerHTML = returnObj.dayHours.minutes < 10 ? "0" + returnObj.dayHours.minutes : returnObj.dayHours.minutes;
+        $('#nightHoursValue')[0].innerHTML = returnObj.nightHours.hours < 10 ? "0" + returnObj.nightHours.hours : returnObj.nightHours.hours;
+        $('#nightMinutesValue')[0].innerHTML = returnObj.nightHours.minutes < 10 ? "0" + returnObj.nightHours.minutes : returnObj.nightHours.minutes;
     }
 }
 
@@ -166,19 +166,35 @@ function updateZuschlagInputValue() {
 }
 
 function changeZuschlag() {
+    updateZuschlagInputValue()
     berechneZuschlag()
+    const hours = Number.parseFloat($('#nightHoursFloat')[0].innerHTML);
+    if (hours && this.zuschlagProStunde && this.workingTimeObj) {
+        this.zuschlagProTag = (hours * this.zuschlagProStunde)
+        $('#dailyZuschlag')[0].innerHTML = this.zuschlagProTag.toFixed(2);
+    }
 }
 
 function getCheckZuschlagValue() {
-    return $('input[name="zuschlagSätze"]:checked')[0].value;
+    const comp = $('input[name="zuschlagSätze"]:checked')[0];
+    return comp.value !== "NaN" ? comp.value : null;
 }
 
 function berechneZuschlag() {
     const zuschlagProzentStr = getCheckZuschlagValue()
     const wageStr = $('#hourlyZuschlagWage')[0].value;
-    if (zuschlagProzentStr !== "" && wageStr !== "") {
+    if (zuschlagProzentStr && zuschlagProzentStr !== "" && wageStr !== "") {
         const wage = Number.parseFloat(wageStr);
         const zuschlagProzent = Number.parseFloat(zuschlagProzentStr);
-        $('#zuschlagProStunde')[0].innerHTML = "" +  wage * zuschlagProzent / 100
+        const inner = wage * zuschlagProzent / 100;
+        this.zuschlagProStunde = inner
+        $('#zuschlagProStunde')[0].innerHTML = "" + inner
+        $('#zuschlagProStunde2')[0].innerHTML = "" + inner
+    }
+}
+
+function calculateInDecimalHours() {
+    if (this.workingTimeObj) {
+        $('#nightHoursFloat')[0].innerHTML = ((this.workingTimeObj.nightHours.hours * 60 + this.workingTimeObj.nightHours.minutes) / 60).toFixed(2)
     }
 }
