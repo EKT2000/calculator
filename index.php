@@ -1,3 +1,7 @@
+<?php
+$rootHost = $_SERVER['HTTP_HOST'] . "/";
+$rootDocument = $_SERVER['DOCUMENT_ROOT'] . "/";
+?>
 <html lang="de">
 <head>
     <title>Zuschlagcalculator</title>
@@ -7,7 +11,7 @@
           integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous"/>
     <script src="https://kit.fontawesome.com/7734d1125e.js" crossorigin="anonymous"></script>
 
-    <script><?php include_once "calculator.js" ?></script>
+    <?php include_once "script.php" ?>
     <style>
         <?php include_once "styles.css"?>
     </style>
